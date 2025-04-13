@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Parking Analysis - SecureVision{% endblock %}
+
+{% block content %}
+<div class="container content-wrapper">
+    <h1><i class="fas fa-parking me-2"></i>Parking Space Analysis</h1>
+    <p class="lead">Monitor and analyze parking spaces to optimize usage and ensure security.</p>
+    
+    <!-- Hidden form for CSRF token -->
+    <form id="csrf-form" style="display: none;">
+        {{ form.hidden_tag() }}
+    </form>
+    
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <!-- Camera Feed -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-camera me-2"></i>Camera Feed</h5>
+                    <span class="badge bg-primary">Live</span>
+                </div>
+                <div class="card-body">
+                    <div class="camera-container">
+                        <video id="cameraFeed" autoplay muted></video>
+                        <canvas id="captureCanvas"></canvas>
+                    </div>
+                    <div class="camera-controls">
+                        <button id="captureButton" class="btn btn-primary" disabled>
+                            <i class="fas fa-camera me-2"></i> Capture Image
+                        </button>
+                        <button id="analyzeParkingButton" class="btn btn-success">
+                            <i class="fas fa-search me-2"></i> Analyze Parking
+                        </button>
+                    </div>
+                    <div id="processingMessage" class="alert alert-info mt-3">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm me-2" role="status">
+                                <span class="visually-hidden">Processing...</span>
+                            </div>
+                            <span>Analyzing parking spaces...</span>
+                        </div>
+                    </div>
+                    <div id="resultContainer" class="mt-3"></div>
+                </div>
+            </div>
+            
+            <!-- Add Parking Space -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Add Parking Space</h5>
+                </div>
+                <div class="card-body">
+                    <form id="addParkingSpaceForm">
+                        <!-- Include CSRF token from the hidden form -->
+                        <input type="hidden" name="csrf_token" value="{{ form.csrf_token.current_token }}">
+                        <div class="mb-3">
+                            <label for="space_identifier" class="form-label">Space Identifier <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="space_identifier" name="space_identifier" placeholder="e.g., A1, B2, etc." required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location_description" class="form-label">Location Description</label>
+                            <input type="text" class="form-control" id="location_description" name="location_description" placeholder="e.g., North Wing, Level 2, etc.">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i> Add Space
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Parking Statistics -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Parking Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center g-3">
+                        <div class="col-md-4">
+                            <div class="card bg-dark">
+                                <div class="card-body">
+                                    <h2 class="mb-0">{{ parking_spaces|length }}</h2>
+                                    <p class="mb-0">Total Spaces</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-danger bg-opacity-25">
+                                <div class="card-body">
+                                    <h2 class="mb-0">{{ parking_spaces|selectattr('is_occupied', 'eq', true)|list|length }}</h2>
+                                    <p class="mb-0">Occupied</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success bg-opacity-25">
+                                <div class="card-body">
+                                    <h2 class="mb-0">{{ parking_spaces|selectattr('is_occupied', 'ne', true)|list|length }}</h2>
+                                    <p class="mb-0">Available</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <!-- Parking Spaces List -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Parking Spaces</h5>
+                </div>
+                <div class="card-body">
+                    <div class="parking-spaces-container">
+                        {% if parking_spaces %}
+                        <div class="row g-3">
+                            {% for space in parking_spaces %}
+                            <div class="col-md-6">
+                                <div id="space-{{ space.id }}" class="card parking-space-card">
+                                    <div class="card-body">
+                                        <span class="status-badge badge {% if space.is_occupied %}bg-danger{% else %}bg-success{% endif %}">
+                                            {% if space.is_occupied %}Occupied{% else %}Free{% endif %}
+                                        </span>
+                                        <h5 class="card-title">{{ space.space_identifier }}</h5>
+                                        <p class="card-text mb-1">{{ space.location_description or 'No location specified' }}</p>
+                                        <small class="text-muted">Last updated: {{ space.last_updated.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> No parking spaces defined yet. Add some using the form.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Parking Logs -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Parking Logs</h5>
+                </div>
+                <div class="card-body">
+                    {% if parking_logs %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Space</th>
+                                    <th>Status</th>
+                                    <th>Vehicle</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in parking_logs %}
+                                <tr>
+                                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ log.space.space_identifier }}</td>
+                                    <td>
+                                        {% if log.is_occupied %}
+                                        <span class="badge bg-danger">Occupied</span>
+                                        {% else %}
+                                        <span class="badge bg-success">Freed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ log.vehicle_plate or 'Unknown' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No parking logs found.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up add parking space form
+        const addParkingSpaceForm = document.getElementById('addParkingSpaceForm');
+        if (addParkingSpaceForm) {
+            addParkingSpaceForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                
+                // Get CSRF token from hidden form if not already in the form
+                if (!formData.get('csrf_token')) {
+                    const csrfForm = document.getElementById('csrf-form');
+                    if (csrfForm) {
+                        const csrfInput = csrfForm.querySelector('input[name="csrf_token"]');
+                        if (csrfInput) {
+                            formData.append('csrf_token', csrfInput.value);
+                        }
+                    }
+                }
+                
+                fetch('/add-parking-space', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        alert(data.message);
+                        // Reload page to show updated list
+                        window.location.reload();
+                    } else {
+                        // Show error message
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding parking space:', error);
+                    alert('An error occurred while adding the parking space. Please try again.');
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

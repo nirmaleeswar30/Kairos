@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}SecureVision - Advanced Security Monitoring{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">Advanced Security Monitoring System</h1>
+        <p class="lead mb-4">Enhance your security with our cutting-edge face recognition, license plate detection, and parking space analysis solutions.</p>
+        {% if not current_user.is_authenticated %}
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg px-5 me-md-2">Log In</a>
+            <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg px-5">Register</a>
+        </div>
+        {% else %}
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-5">Go to Dashboard</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="feature-section bg-dark">
+    <div class="container">
+        <h2 class="text-center mb-5">Our Features</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 feature-card">
+                    <div class="card-body text-center">
+                        <div class="feature-icon text-primary">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3 class="card-title">Face Recognition</h3>
+                        <p class="card-text">Accurate and fast face detection and recognition for attendance tracking and access control.</p>
+                        <ul class="text-start">
+                            <li>Automated attendance tracking</li>
+                            <li>Real-time recognition</li>
+                            <li>High accuracy and security</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 feature-card">
+                    <div class="card-body text-center">
+                        <div class="feature-icon text-info">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <h3 class="card-title">Plate Detection</h3>
+                        <p class="card-text">Automatic license plate recognition for vehicle monitoring and access management.</p>
+                        <ul class="text-start">
+                            <li>Vehicle identification</li>
+                            <li>Authorized vehicle tracking</li>
+                            <li>Security breach alerts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 feature-card">
+                    <div class="card-body text-center">
+                        <div class="feature-icon text-success">
+                            <i class="fas fa-parking"></i>
+                        </div>
+                        <h3 class="card-title">Parking Analysis</h3>
+                        <p class="card-text">Monitor parking space availability and usage with real-time analytics.</p>
+                        <ul class="text-start">
+                            <li>Real-time space monitoring</li>
+                            <li>Occupancy statistics</li>
+                            <li>Optimize parking management</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose SecureVision?</h2>
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <img src="https://images.unsplash.com/photo-1517433456452-f9633a875f6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" class="img-fluid rounded" alt="Security Camera">
+            </div>
+            <div class="col-md-6">
+                <div class="ps-md-4 mt-4 mt-md-0">
+                    <h3>Comprehensive Security Solution</h3>
+                    <p>Our integrated system combines multiple security technologies to provide a complete monitoring solution for your organization.</p>
+                    
+                    <div class="d-flex align-items-start mt-4">
+                        <div class="bg-primary rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-lock text-white"></i>
+                        </div>
+                        <div>
+                            <h4>Enhanced Security</h4>
+                            <p>Advanced recognition algorithms provide reliable identification and monitoring.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start mt-4">
+                        <div class="bg-info rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-chart-line text-white"></i>
+                        </div>
+                        <div>
+                            <h4>Real-time Analytics</h4>
+                            <p>Gain valuable insights with detailed reports and real-time monitoring capabilities.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start mt-4">
+                        <div class="bg-success rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-cogs text-white"></i>
+                        </div>
+                        <div>
+                            <h4>Easy Integration</h4>
+                            <p>Our system is designed to integrate seamlessly with your existing security infrastructure.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-dark">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to enhance your security?</h2>
+        <p class="lead mb-5">Join organizations that trust SecureVision for their security monitoring needs.</p>
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-5">Get Started Now</a>
+        {% else %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-5">Go to Dashboard</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

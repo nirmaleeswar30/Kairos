@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - SecureVision{% endblock %}
+
+{% block content %}
+<div class="container content-wrapper">
+    <h1><i class="fas fa-chart-line me-2"></i>Security Reports</h1>
+    <p class="lead">View analytics and reports for security monitoring activities.</p>
+    
+    <!-- Report Types -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 report-card">
+                <div class="card-body text-center">
+                    <div class="feature-icon text-primary mb-3">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <h3 class="card-title">Attendance Reports</h3>
+                    <p class="card-text">Track attendance patterns and monitor check-in/check-out activities.</p>
+                    <a href="#attendanceReportSection" class="btn btn-outline-primary mt-3">
+                        <i class="fas fa-eye me-2"></i> View Report
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 report-card">
+                <div class="card-body text-center">
+                    <div class="feature-icon text-info mb-3">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <h3 class="card-title">Vehicle Reports</h3>
+                    <p class="card-text">Analyze license plate detections and vehicle authorization status.</p>
+                    <a href="#vehicleReportSection" class="btn btn-outline-info mt-3">
+                        <i class="fas fa-eye me-2"></i> View Report
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 report-card">
+                <div class="card-body text-center">
+                    <div class="feature-icon text-success mb-3">
+                        <i class="fas fa-parking"></i>
+                    </div>
+                    <h3 class="card-title">Parking Reports</h3>
+                    <p class="card-text">Monitor parking space usage and occupancy patterns over time.</p>
+                    <a href="#parkingReportSection" class="btn btn-outline-success mt-3">
+                        <i class="fas fa-eye me-2"></i> View Report
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Attendance Report Section -->
+    <section id="attendanceReportSection" class="mb-5">
+        <div class="card">
+            <div class="card-header bg-primary bg-opacity-25">
+                <h2 class="mb-0"><i class="fas fa-user-check me-2"></i>Attendance Report</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div id="attendanceChartContainer" class="chart-container">
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0">Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Date Range:</strong> Last 7 days</p>
+                                <p><strong>Total Check-ins:</strong> <span id="totalCheckIns">Loading...</span></p>
+                                <p><strong>Average Daily Check-ins:</strong> <span id="avgCheckIns">Loading...</span></p>
+                                <p><strong>Busiest Day:</strong> <span id="busiestDay">Loading...</span></p>
+                                <hr>
+                                <p class="mb-0"><small>This report shows the attendance patterns over the past week. Use this data to identify trends and peak times.</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <h5>Recommendations</h5>
+                    <ul>
+                        <li>Monitor attendance patterns to optimize staffing</li>
+                        <li>Set up alerts for unusual attendance activity</li>
+                        <li>Compare attendance with historical data to identify trends</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Vehicle Report Section -->
+    <section id="vehicleReportSection" class="mb-5">
+        <div class="card">
+            <div class="card-header bg-info bg-opacity-25">
+                <h2 class="mb-0"><i class="fas fa-car me-2"></i>Vehicle Report</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div id="plateChartContainer" class="chart-container">
+                            <canvas id="plateChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0">Plate Detection Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Date Range:</strong> Last 7 days</p>
+                                <p><strong>Total Detections:</strong> <span id="totalDetections">Loading...</span></p>
+                                <p><strong>Authorized Vehicles:</strong> <span id="authorizedVehicles">Loading...</span></p>
+                                <p><strong>Unauthorized Vehicles:</strong> <span id="unauthorizedVehicles">Loading...</span></p>
+                                <hr>
+                                <p class="mb-0"><small>This report shows the license plate detection activity over the past week. Use this data to identify security concerns.</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <h5>Recommendations</h5>
+                    <ul>
+                        <li>Regularly update authorized vehicle database</li>
+                        <li>Set up alerts for unauthorized vehicle detections</li>
+                        <li>Monitor peak times for vehicle traffic</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Parking Report Section -->
+    <section id="parkingReportSection">
+        <div class="card">
+            <div class="card-header bg-success bg-opacity-25">
+                <h2 class="mb-0"><i class="fas fa-parking me-2"></i>Parking Report</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div id="parkingChartContainer" class="chart-container">
+                            <canvas id="parkingChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0">Current Status</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="parkingSummary">
+                                    <p><strong>Loading parking data...</strong></p>
+                                </div>
+                                <hr>
+                                <p class="mb-0"><small>This report shows the current parking space usage. Use this data to optimize parking space allocation.</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <h5>Recommendations</h5>
+                    <ul>
+                        <li>Monitor peak parking times to prevent overflow</li>
+                        <li>Consider expanding parking if consistently at high capacity</li>
+                        <li>Implement reservation system for high-demand periods</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Populate summary statistics when data is loaded
+        fetch('/api/attendance-data')
+            .then(response => response.json())
+            .then(data => {
+                // Calculate summary stats
+                const totalCheckIns = data.data.reduce((sum, count) => sum + count, 0);
+                const avgCheckIns = (totalCheckIns / data.data.length).toFixed(1);
+                
+                // Find busiest day
+                let maxIndex = 0;
+                for (let i = 1; i < data.data.length; i++) {
+                    if (data.data[i] > data.data[maxIndex]) {
+                        maxIndex = i;
+                    }
+                }
+                const busiestDay = data.labels[maxIndex];
+                
+                // Update summary elements
+                document.getElementById('totalCheckIns').textContent = totalCheckIns;
+                document.getElementById('avgCheckIns').textContent = avgCheckIns;
+                document.getElementById('busiestDay').textContent = busiestDay;
+            })
+            .catch(error => {
+                console.error('Error loading attendance summary data:', error);
+            });
+            
+        // Populate plate detection summary
+        fetch('/api/plate-data')
+            .then(response => response.json())
+            .then(data => {
+                // Calculate summary stats
+                const totalDetections = data.data.reduce((sum, count) => sum + count, 0);
+                
+                // For authorized/unauthorized split, we'll use a placeholder as we don't have that specific API
+                // In a real implementation, this would come from a dedicated API endpoint
+                const authorizedPercent = 75; // placeholder
+                const authorizedVehicles = Math.round(totalDetections * (authorizedPercent / 100));
+                const unauthorizedVehicles = totalDetections - authorizedVehicles;
+                
+                // Update summary elements
+                document.getElementById('totalDetections').textContent = totalDetections;
+                document.getElementById('authorizedVehicles').textContent = `${authorizedVehicles} (${authorizedPercent}%)`;
+                document.getElementById('unauthorizedVehicles').textContent = `${unauthorizedVehicles} (${100 - authorizedPercent}%)`;
+            })
+            .catch(error => {
+                console.error('Error loading plate detection summary data:', error);
+            });
+    });
+</script>
+{% endblock %}

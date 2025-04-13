@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Face Recognition - SecureVision{% endblock %}
+
+{% block content %}
+<div class="container content-wrapper">
+    <h1><i class="fas fa-user-shield me-2"></i>Face Recognition</h1>
+    <p class="lead">Use face recognition for automated attendance tracking and access control.</p>
+    
+    <!-- Hidden form for CSRF token -->
+    <form id="csrf-form" style="display: none;">
+        {{ form.hidden_tag() }}
+    </form>
+    
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <!-- Camera Feed -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-camera me-2"></i>Camera Feed</h5>
+                    <span class="badge bg-primary">Live</span>
+                </div>
+                <div class="card-body">
+                    <div class="camera-container">
+                        <video id="cameraFeed" autoplay muted></video>
+                        <canvas id="captureCanvas"></canvas>
+                    </div>
+                    <div class="camera-controls">
+                        <button id="captureButton" class="btn btn-primary" disabled>
+                            <i class="fas fa-camera me-2"></i> Capture Image
+                        </button>
+                        <button id="registerFaceButton" class="btn btn-info">
+                            <i class="fas fa-user-plus me-2"></i> Register Face
+                        </button>
+                        <button id="faceAttendanceButton" class="btn btn-success">
+                            <i class="fas fa-user-check me-2"></i> Record Attendance
+                        </button>
+                    </div>
+                    <div id="processingMessage" class="alert alert-info mt-3">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm me-2" role="status">
+                                <span class="visually-hidden">Processing...</span>
+                            </div>
+                            <span>Processing face...</span>
+                        </div>
+                    </div>
+                    <div id="resultContainer" class="mt-3"></div>
+                </div>
+            </div>
+            
+            <!-- Face Registration -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-id-card me-2"></i>Face Registration Status</h5>
+                </div>
+                <div class="card-body">
+                    {% if has_face_data %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i> Your face is registered in the system.
+                    </div>
+                    <p>You can use face recognition for attendance check-in and check-out.</p>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Your face is not registered yet.
+                    </div>
+                    <p>Use the "Register Face" button above to add your face to the system.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <!-- Instructions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Instructions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="instructionsAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    How to Register Your Face
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#instructionsAccordion">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Position your face clearly in the camera view</li>
+                                        <li>Ensure good lighting on your face</li>
+                                        <li>Click the "Capture Image" button</li>
+                                        <li>Click the "Register Face" button</li>
+                                        <li>Wait for confirmation message</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    How to Record Attendance
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#instructionsAccordion">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Position your face clearly in the camera view</li>
+                                        <li>Click the "Capture Image" button</li>
+                                        <li>Click the "Record Attendance" button</li>
+                                        <li>The system will automatically detect if it's a check-in or check-out</li>
+                                        <li>A confirmation message will appear</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Best Practices
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#instructionsAccordion">
+                                <div class="accordion-body">
+                                    <ul>
+                                        <li>Ensure proper lighting when capturing images</li>
+                                        <li>Look directly at the camera</li>
+                                        <li>Keep a neutral expression</li>
+                                        <li>Remove glasses or other face obstructions if possible</li>
+                                        <li>Maintain a consistent appearance between registration and verification</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Attendance Records -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Attendance Records</h5>
+                </div>
+                <div class="card-body">
+                    <div id="attendanceRecords">
+                        {% if attendance_records %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Check-in</th>
+                                        <th>Check-out</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in attendance_records %}
+                                    <tr class="attendance-record">
+                                        <td>{{ record.check_in_time.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ record.check_in_time.strftime('%H:%M:%S') }}</td>
+                                        <td>{{ record.check_out_time.strftime('%H:%M:%S') if record.check_out_time else 'Not checked out' }}</td>
+                                        <td>
+                                            {% if record.check_out_time %}
+                                            <span class="badge bg-success">Complete</span>
+                                            {% else %}
+                                            <span class="badge bg-warning">In Progress</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> No attendance records found.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+{% endblock %}

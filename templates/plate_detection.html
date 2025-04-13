@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}License Plate Detection - SecureVision{% endblock %}
+
+{% block content %}
+<div class="container content-wrapper">
+    <h1><i class="fas fa-car me-2"></i>License Plate Detection</h1>
+    <p class="lead">Detect and manage vehicle license plates for security monitoring.</p>
+    
+    <!-- Hidden form for CSRF token -->
+    <form id="csrf-form" style="display: none;">
+        {{ form.hidden_tag() }}
+    </form>
+    
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <!-- Camera Feed -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-camera me-2"></i>Camera Feed</h5>
+                    <span class="badge bg-primary">Live</span>
+                </div>
+                <div class="card-body">
+                    <div class="camera-container">
+                        <video id="cameraFeed" autoplay muted></video>
+                        <canvas id="captureCanvas"></canvas>
+                    </div>
+                    <div class="camera-controls">
+                        <button id="captureButton" class="btn btn-primary" disabled>
+                            <i class="fas fa-camera me-2"></i> Capture Image
+                        </button>
+                        <button id="detectPlateButton" class="btn btn-info">
+                            <i class="fas fa-search me-2"></i> Detect Plate
+                        </button>
+                    </div>
+                    <div id="processingMessage" class="alert alert-info mt-3">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm me-2" role="status">
+                                <span class="visually-hidden">Processing...</span>
+                            </div>
+                            <span>Detecting license plate...</span>
+                        </div>
+                    </div>
+                    <div id="resultContainer" class="mt-3"></div>
+                </div>
+            </div>
+            
+            <!-- Instructions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Instructions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="instructionsAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    How to Detect License Plates
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#instructionsAccordion">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Position the camera to clearly capture the license plate</li>
+                                        <li>Ensure adequate lighting on the plate</li>
+                                        <li>Click the "Capture Image" button</li>
+                                        <li>Click the "Detect Plate" button</li>
+                                        <li>Wait for the system to process and display results</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Managing Authorized Plates
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#instructionsAccordion">
+                                <div class="accordion-body">
+                                    <p>As an administrator, you can:</p>
+                                    <ol>
+                                        <li>Register new authorized plates using the form</li>
+                                        <li>Edit existing plate information</li>
+                                        <li>Mark plates as authorized or unauthorized</li>
+                                        <li>Add vehicle and owner information for better identification</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Best Practices
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#instructionsAccordion">
+                                <div class="accordion-body">
+                                    <ul>
+                                        <li>Position camera at appropriate angle (15-30 degrees) for optimal plate detection</li>
+                                        <li>Ensure license plates are clean and unobstructed</li>
+                                        <li>Adequate lighting helps improve detection accuracy</li>
+                                        <li>Keep a database of regular visitors for quick identification</li>
+                                        <li>Regularly update the authorized plates database</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            {% if current_user.role == 'admin' %}
+            <!-- Register New Plate (Admin Only) -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Register New Plate</h5>
+                </div>
+                <div class="card-body">
+                    <form id="plateRegistrationForm">
+                        <!-- Include CSRF token from the hidden form -->
+                        <input type="hidden" name="csrf_token" value="{{ form.csrf_token.current_token }}">
+                        <div class="mb-3">
+                            <label for="plate_number" class="form-label">License Plate Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="plate_number" name="plate_number" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="owner_name" class="form-label">Owner Name</label>
+                                    <input type="text" class="form-control" id="owner_name" name="owner_name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="is_authorized" class="form-label">Authorization Status</label>
+                                    <select class="form-select" id="is_authorized" name="is_authorized">
+                                        <option value="true">Authorized</option>
+                                        <option value="false">Unauthorized</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="vehicle_make" class="form-label">Vehicle Make</label>
+                                    <input type="text" class="form-control" id="vehicle_make" name="vehicle_make">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="vehicle_model" class="form-label">Vehicle Model</label>
+                                    <input type="text" class="form-control" id="vehicle_model" name="vehicle_model">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i> Register Plate
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Registered Plates -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Registered Plates</h5>
+                </div>
+                <div class="card-body">
+                    {% if registered_plates %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Plate Number</th>
+                                    <th>Owner</th>
+                                    <th>Vehicle</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for plate in registered_plates %}
+                                <tr>
+                                    <td>{{ plate.plate_number }}</td>
+                                    <td>{{ plate.owner_name or 'Unknown' }}</td>
+                                    <td>{{ plate.vehicle_make }} {{ plate.vehicle_model }}</td>
+                                    <td>
+                                        {% if plate.is_authorized %}
+                                        <span class="badge bg-success">Authorized</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Unauthorized</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> No registered plates found.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Recent Detections -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Plate Detections</h5>
+                </div>
+                <div class="card-body">
+                    <div class="plate-detection-log">
+                        {% if plate_logs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Plate</th>
+                                        <th>Confidence</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in plate_logs %}
+                                    <tr>
+                                        <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>{{ log.plate_number }}</td>
+                                        <td>{{ (log.confidence * 100)|round(2) }}%</td>
+                                        <td>
+                                            {% if log.is_authorized %}
+                                            <span class="badge bg-success">Authorized</span>
+                                            {% else %}
+                                            <span class="badge bg-danger">Unauthorized</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> No plate detection logs found.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up plate registration form
+        const plateRegistrationForm = document.getElementById('plateRegistrationForm');
+        if (plateRegistrationForm) {
+            plateRegistrationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                
+                // Get CSRF token from hidden form if not already in the form
+                if (!formData.get('csrf_token')) {
+                    const csrfForm = document.getElementById('csrf-form');
+                    if (csrfForm) {
+                        const csrfInput = csrfForm.querySelector('input[name="csrf_token"]');
+                        if (csrfInput) {
+                            formData.append('csrf_token', csrfInput.value);
+                        }
+                    }
+                }
+                
+                fetch('/register-plate', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        alert(data.message);
+                        // Reload page to show updated list
+                        window.location.reload();
+                    } else {
+                        // Show error message
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error registering plate:', error);
+                    alert('An error occurred while registering the plate. Please try again.');
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

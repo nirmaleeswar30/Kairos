@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Error {{ error_code }} - SecureVision{% endblock %}
+
+{% block content %}
+<div class="container content-wrapper">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
+            <div class="error-container p-5">
+                <div class="display-1 text-danger mb-4">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h1 class="display-4 fw-bold mb-4">Error {{ error_code }}</h1>
+                <p class="lead mb-5">{{ error_message }}</p>
+                
+                <div class="error-details mb-5">
+                    {% if error_code == 404 %}
+                    <p>The page you're looking for doesn't exist or may have been moved.</p>
+                    <div class="mt-4">
+                        <svg class="mb-4" width="200" height="120" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M40 40L60 80H20L40 40Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M100 25C100 38.8071 88.8071 50 75 50C61.1929 50 50 38.8071 50 25C50 11.1929 61.1929 0 75 0C88.8071 0 100 11.1929 100 25Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M160 80L180 40L140 40L160 80Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M10 100L190 100" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    {% elif error_code == 500 %}
+                    <p>Something went wrong on our server. We're working to fix the issue.</p>
+                    <div class="mt-4">
+                        <svg class="mb-4" width="200" height="120" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 30H180V90H20V30Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M20 30L100 70L180 30" stroke="currentColor" stroke-width="2"/>
+                            <path d="M155 110H45L55 90H145L155 110Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M100 10V30" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="100" cy="10" r="5" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    {% else %}
+                    <p>Something unexpected happened. Please try again later.</p>
+                    {% endif %}
+                </div>
+                
+                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                        <i class="fas fa-home me-2"></i> Return to Home
+                    </a>
+                    <button onclick="window.history.back()" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="fas fa-arrow-left me-2"></i> Go Back
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

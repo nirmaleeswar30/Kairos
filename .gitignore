@@ -1,0 +1,89 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+develop-eggs/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+.env/
+env/
+virtualenv/
+.venv/
+
+# Flask and Application
+instance/
+*.sqlite
+*.db
+*.log
+*.pid
+
+# Static Uploads
+static/uploads/*
+!static/uploads/.gitkeep
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*~
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Dependency Management
+Pipfile.lock
+poetry.lock
+
+# Testing
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Docker
+docker-compose.yml
+Dockerfile
+*.dockerignore
+
+# Sensitive Data
+*.env
+*.key
+*.pem
+*.crt
+*.secret
+secrets/
+credentials/
+
+# Miscellaneous
+*.bak
+*.gho
+*.ori
+*.orig
+*.tmp

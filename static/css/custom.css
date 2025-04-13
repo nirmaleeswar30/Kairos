@@ -1,0 +1,196 @@
+/* Custom CSS styles for the security monitoring system */
+
+/* General styling */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.content-wrapper {
+    padding: 2rem 0;
+}
+
+/* Landing page styles */
+.hero-section {
+    padding: 4rem 0;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                url('https://images.unsplash.com/photo-1557597774-9d273605dfa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+    color: white;
+    text-align: center;
+}
+
+.feature-section {
+    padding: 3rem 0;
+}
+
+.feature-card {
+    height: 100%;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Dashboard styles */
+.stat-card {
+    border-left: 4px solid;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card-primary {
+    border-left-color: var(--bs-primary);
+}
+
+.stat-card-success {
+    border-left-color: var(--bs-success);
+}
+
+.stat-card-info {
+    border-left-color: var(--bs-info);
+}
+
+.stat-card-warning {
+    border-left-color: var(--bs-warning);
+}
+
+.dashboard-chart {
+    height: 300px;
+    margin-bottom: 1rem;
+}
+
+/* Camera and video styles */
+.camera-container {
+    position: relative;
+    width: 100%;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: #000;
+}
+
+#cameraFeed {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+#captureCanvas {
+    width: 100%;
+    height: auto;
+    display: none;
+}
+
+.camera-controls {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+#processingMessage {
+    display: none;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+#resultContainer {
+    display: none;
+    margin-top: 1rem;
+}
+
+/* Face recognition styles */
+.face-registration-container {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.attendance-record {
+    transition: transform 0.2s ease;
+}
+
+.attendance-record:hover {
+    transform: translateX(5px);
+}
+
+/* Plate detection styles */
+.plate-result {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.plate-detection-log {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Parking analysis styles */
+.parking-spaces-container {
+    margin-top: 1.5rem;
+}
+
+.parking-space-card {
+    transition: transform 0.2s ease;
+}
+
+.parking-space-card:hover {
+    transform: translateY(-3px);
+}
+
+.status-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+
+/* Reports styles */
+.report-card {
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+
+.report-card:hover {
+    transform: translateY(-5px);
+}
+
+.chart-container {
+    height: 300px;
+    margin-bottom: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 2rem 0;
+    }
+    
+    .feature-section {
+        padding: 1.5rem 0;
+    }
+    
+    .dashboard-chart {
+        height: 250px;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+}
